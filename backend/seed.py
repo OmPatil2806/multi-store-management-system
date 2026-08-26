@@ -4,6 +4,7 @@ from passlib.context import CryptContext
 
 from database import Base, SessionLocal, engine
 from models import Employee, Store, User, UserRole
+from utils import generate_employee_code
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -15,6 +16,13 @@ STORES = [
     {"name": "Fashion", "type": "Clothes & Fashion"},
     {"name": "Electronics", "type": "Electronics"},
 ]
+
+# Placeholder personal details for the seeded test employee per store.
+EMPLOYEE_DETAILS = {
+    "Grocery": {"email": "grocery.employee@example.com", "dob": date(1990, 5, 14)},
+    "Fashion": {"email": "fashion.employee@example.com", "dob": date(1992, 8, 23)},
+    "Electronics": {"email": "electronics.employee@example.com", "dob": date(1988, 11, 2)},
+}
 
 
 def seed():
@@ -37,6 +45,7 @@ def seed():
         if owner is None:
             owner = User(
                 username="owner",
+                email="owner@example.com",
                 hashed_password=pwd_context.hash(PLACEHOLDER_PASSWORD),
                 role=UserRole.OWNER,
                 store_id=None,
@@ -47,6 +56,7 @@ def seed():
         for store_name, store in stores_by_name.items():
             employee_name = f"{store_name} Test Employee"
             username = f"{store_name.lower()}_employee"
+            details = EMPLOYEE_DETAILS[store_name]
 
             employee = (
                 db.query(Employee)
@@ -54,20 +64,31 @@ def seed():
                 .first()
             )
             if employee is None:
+                employee_code = generate_employee_code(store, db)
                 employee = Employee(
                     store_id=store.id,
                     name=employee_name,
                     role_title="Cashier",
                     hire_date=date.today(),
+                    email=details["email"],
+                    date_of_birth=details["dob"],
+                    employee_code=employee_code,
                 )
                 db.add(employee)
                 db.flush()
-                created.append(f"Employee: {employee_name} (store='{store_name}')")
+                created.append(
+                    f"Employee: {employee_name} (store='{store_name}', code='{employee_code}')"
+                )
 
             user = db.query(User).filter_by(username=username).first()
             if user is None:
                 user = User(
                     username=username,
+                    # Employee accounts don't log in via email (Phase 2 uses
+                    # employee_code via the linked Employee record), but the
+                    # column is NOT NULL/unique at the User level, so reuse
+                    # the employee's contact email here.
+                    email=employee.email,
                     hashed_password=pwd_context.hash(PLACEHOLDER_PASSWORD),
                     role=UserRole.EMPLOYEE,
                     store_id=store.id,

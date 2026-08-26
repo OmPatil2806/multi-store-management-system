@@ -43,8 +43,12 @@ class Store(Base):
 class User(Base):
     __tablename__ = "users"
 
+    # Login identity differs by role (enforced in Phase 2, not here):
+    # owner logs in with `email`; employee logs in with their `employee_code`,
+    # which is looked up through the linked Employee record via employee_id.
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String, unique=True, nullable=False, index=True)
+    email = Column(String, unique=True, nullable=False)
     hashed_password = Column(String, nullable=False)
     role = Column(SqlEnum(UserRole), nullable=False)
     store_id = Column(Integer, ForeignKey("stores.id"), nullable=True)
@@ -70,6 +74,11 @@ class Employee(Base):
     phone = Column(String, nullable=True)
     salary = Column(Numeric(10, 2), nullable=True)
     hire_date = Column(Date, nullable=True)
+    email = Column(String, unique=True, nullable=False)
+    date_of_birth = Column(Date, nullable=False)
+    # Business-facing ID, e.g. "GRO-0001" — auto-generated via
+    # generate_employee_code() in utils.py, never typed by hand.
+    employee_code = Column(String, unique=True, nullable=False)
 
     store = relationship("Store", back_populates="employees")
     user = relationship("User", back_populates="employee", uselist=False)
