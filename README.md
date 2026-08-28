@@ -1,1 +1,0 @@
-Multi-Supermarket Management System 
