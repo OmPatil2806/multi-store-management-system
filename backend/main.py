@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from routers import auth
+from routers import auth, employees, products
 
 app = FastAPI(title="Multi-Supermarket Management System")
 
@@ -14,6 +14,8 @@ app.add_middleware(
 )
 
 app.include_router(auth.router)
+app.include_router(products.router)
+app.include_router(employees.router)
 
 
 @app.get("/health")

@@ -1,6 +1,7 @@
 import enum
 
 from sqlalchemy import (
+    Boolean,
     Column,
     Date,
     DateTime,
@@ -53,6 +54,7 @@ class User(Base):
     role = Column(SqlEnum(UserRole), nullable=False)
     store_id = Column(Integer, ForeignKey("stores.id"), nullable=True)
     employee_id = Column(Integer, ForeignKey("employees.id"), nullable=True)
+    is_active = Column(Boolean, nullable=False, default=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     store = relationship("Store", back_populates="users")
@@ -79,6 +81,10 @@ class Employee(Base):
     # Business-facing ID, e.g. "GRO-0001" — auto-generated via
     # generate_employee_code() in utils.py, never typed by hand.
     employee_code = Column(String, unique=True, nullable=False)
+    # Soft-delete flag: False means "removed" by the owner. Kept as a row
+    # (not hard-deleted) so historical Sale records tied to employee_id
+    # stay intact once Phase 7 adds sales.
+    is_active = Column(Boolean, nullable=False, default=True)
 
     store = relationship("Store", back_populates="employees")
     user = relationship("User", back_populates="employee", uselist=False)
