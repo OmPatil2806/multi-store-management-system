@@ -36,7 +36,11 @@ def login(payload: LoginRequest, db: Session = Depends(get_db)):
                 .first()
             )
 
-    if user is None or not verify_password(payload.password, user.hashed_password):
+    if (
+        user is None
+        or not user.is_active
+        or not verify_password(payload.password, user.hashed_password)
+    ):
         raise INVALID_CREDENTIALS
 
     token = create_access_token(

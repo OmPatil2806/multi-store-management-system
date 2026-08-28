@@ -29,7 +29,7 @@ def get_current_user(
         raise CREDENTIALS_EXCEPTION
 
     user = db.query(User).filter(User.id == user_id).first()
-    if user is None:
+    if user is None or not user.is_active:
         raise CREDENTIALS_EXCEPTION
 
     return user
