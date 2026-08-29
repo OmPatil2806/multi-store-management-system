@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import { LayoutDashboard, Package, Users, User, ShoppingCart, FileText, LogOut, Store } from 'lucide-react'
+import { LayoutDashboard, Package, Users, User, ShoppingCart, Receipt, FileText, LogOut, Store } from 'lucide-react'
 
 import { useAuth } from '@/auth/AuthContext'
 import { cn } from '@/lib/utils'
@@ -12,6 +12,7 @@ function getNavItems(role) {
       ? { to: '/employees', label: 'Employees', icon: Users }
       : { to: '/my-profile', label: 'My Profile', icon: User },
     { to: '/checkout', label: 'Checkout', icon: ShoppingCart },
+    { to: '/sales', label: 'Sales', icon: Receipt },
     { to: '/reports', label: 'Reports', icon: FileText },
   ]
 }

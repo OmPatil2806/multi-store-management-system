@@ -4,12 +4,14 @@ import { AuthProvider } from '@/auth/AuthContext'
 import ProtectedRoute from '@/auth/ProtectedRoute'
 import AppLayout from '@/components/AppLayout'
 import { Toaster } from '@/components/ui/sonner'
+import Checkout from '@/pages/Checkout'
 import ComingSoon from '@/pages/ComingSoon'
 import Dashboard from '@/pages/Dashboard'
 import Employees from '@/pages/Employees'
 import Login from '@/pages/Login'
 import MyProfile from '@/pages/MyProfile'
 import Products from '@/pages/Products'
+import SalesHistory from '@/pages/SalesHistory'
 
 function ProtectedPage({ children }) {
   return (
@@ -62,7 +64,15 @@ function App() {
           path="/checkout"
           element={
             <ProtectedPage>
-              <ComingSoon title="Checkout" />
+              <Checkout />
+            </ProtectedPage>
+          }
+        />
+        <Route
+          path="/sales"
+          element={
+            <ProtectedPage>
+              <SalesHistory />
             </ProtectedPage>
           }
         />
