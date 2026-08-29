@@ -171,3 +171,57 @@ class SaleResponse(BaseModel):
     total_amount: Decimal
     payment_method: PaymentMethod
     items: list[SaleItemResponse]
+
+
+# ---------------------------------------------------------------------------
+# Reports / Dashboard
+# ---------------------------------------------------------------------------
+
+
+class RevenueByDay(BaseModel):
+    date: str
+    revenue: Decimal
+
+
+class TopProduct(BaseModel):
+    product_name: str
+    quantity_sold: int
+    revenue: Decimal
+
+
+class PaymentMethodBreakdown(BaseModel):
+    cash: Decimal
+    card: Decimal
+    upi: Decimal
+    other: Decimal
+
+
+class StockByCategory(BaseModel):
+    category: str | None
+    total_quantity: int
+
+
+class StoreMetrics(BaseModel):
+    store_id: int
+    store_name: str
+    total_revenue: Decimal
+    total_sales_count: int
+    stock_value: Decimal
+    low_stock_count: int
+    revenue_by_day: list[RevenueByDay]
+    top_products: list[TopProduct]
+    sales_by_payment_method: PaymentMethodBreakdown
+    stock_by_category: list[StockByCategory]
+
+
+class DashboardResponse(BaseModel):
+    total_revenue: Decimal
+    total_sales_count: int
+    stock_value: Decimal
+    low_stock_count: int
+    revenue_by_day: list[RevenueByDay]
+    top_products: list[TopProduct]
+    sales_by_payment_method: PaymentMethodBreakdown
+    stock_by_category: list[StockByCategory]
+    # Only present for the owner viewing all stores combined (no store_id filter).
+    per_store: list[StoreMetrics] | None = None
