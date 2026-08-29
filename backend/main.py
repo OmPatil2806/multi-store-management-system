@@ -11,6 +11,10 @@ app.add_middleware(
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
+    # Content-Disposition isn't a CORS-safelisted response header by default,
+    # so without this the frontend can download the file fine but can't read
+    # the filename off the response — needed for the Excel export download.
+    expose_headers=["Content-Disposition"],
 )
 
 app.include_router(auth.router)

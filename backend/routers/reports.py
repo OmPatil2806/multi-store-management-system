@@ -1,12 +1,14 @@
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import StreamingResponse
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from database import get_db
 from dependencies import get_current_user
 from models import PaymentMethod, Product, Sale, SaleItem, Store, User, UserRole
+from reports import generate_stock_report
 from schemas import (
     DashboardResponse,
     PaymentMethodBreakdown,
@@ -140,3 +142,42 @@ def get_dashboard(
     # pass is ignored, same pattern as products/sales.
     metrics = _compute_metrics(db, [current_user.store_id], since)
     return DashboardResponse(**metrics)
+
+
+def _store_products(db: Session, store_id: int) -> list[Product]:
+    return db.query(Product).filter(Product.store_id == store_id).order_by(Product.name).all()
+
+
+@router.get("/export/products")
+def export_products(
+    store_id: int | None = None,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    today = date.today().isoformat()
+
+    if current_user.role == UserRole.OWNER:
+        if store_id is not None:
+            store = db.query(Store).filter(Store.id == store_id).first()
+            if store is None:
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Store not found")
+            buffer = generate_stock_report({store.name: _store_products(db, store.id)})
+            filename = f"{store.name}_Stock_Report_{today}.xlsx"
+        else:
+            stores = db.query(Store).order_by(Store.id).all()
+            store_products = {s.name: _store_products(db, s.id) for s in stores}
+            buffer = generate_stock_report(store_products)
+            filename = f"Opex_Organization_Stock_Report_{today}.xlsx"
+    else:
+        # Employees can never export another store's data or the combined
+        # report — any store_id they pass is silently ignored, same as
+        # every other employee-scoped endpoint in this app.
+        store = db.query(Store).filter(Store.id == current_user.store_id).first()
+        buffer = generate_stock_report({store.name: _store_products(db, store.id)})
+        filename = f"{store.name}_Stock_Report_{today}.xlsx"
+
+    return StreamingResponse(
+        buffer,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
