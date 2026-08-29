@@ -3,7 +3,7 @@ from decimal import Decimal
 
 from pydantic import BaseModel, ConfigDict
 
-from models import UserRole
+from models import PaymentMethod, UserRole
 
 
 class LoginRequest(BaseModel):
@@ -133,3 +133,41 @@ class EmployeeSelfResponse(BaseModel):
     employee_code: str
     hire_date: date | None
     is_active: bool
+
+
+# ---------------------------------------------------------------------------
+# Sales
+# ---------------------------------------------------------------------------
+
+
+class SaleItemCreate(BaseModel):
+    product_id: int
+    quantity: int
+
+
+class SaleCreate(BaseModel):
+    items: list[SaleItemCreate]
+    payment_method: PaymentMethod
+    # Only used when the requester is the owner — an employee's store_id is
+    # always taken from their token, never from this field (same pattern as
+    # ProductCreate.store_id).
+    store_id: int | None = None
+
+
+class SaleItemResponse(BaseModel):
+    product_id: int
+    product_name: str
+    quantity: int
+    price_at_sale: Decimal
+    line_total: Decimal
+
+
+class SaleResponse(BaseModel):
+    id: int
+    store_id: int
+    employee_id: int | None
+    employee_name: str | None
+    date: datetime
+    total_amount: Decimal
+    payment_method: PaymentMethod
+    items: list[SaleItemResponse]

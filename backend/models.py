@@ -22,6 +22,13 @@ class UserRole(str, enum.Enum):
     EMPLOYEE = "employee"
 
 
+class PaymentMethod(str, enum.Enum):
+    CASH = "cash"
+    CARD = "card"
+    UPI = "upi"
+    OTHER = "other"
+
+
 # ---------------------------------------------------------------------------
 # Store & User
 # ---------------------------------------------------------------------------
@@ -119,9 +126,12 @@ class Sale(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     store_id = Column(Integer, ForeignKey("stores.id"), nullable=False)
-    employee_id = Column(Integer, ForeignKey("employees.id"), nullable=False)
+    # Nullable: the owner can also process a checkout, and the owner has no
+    # Employee record — NULL here means "the owner processed this sale".
+    employee_id = Column(Integer, ForeignKey("employees.id"), nullable=True)
     date = Column(DateTime(timezone=True), server_default=func.now())
     total_amount = Column(Numeric(10, 2), nullable=False, default=0)
+    payment_method = Column(SqlEnum(PaymentMethod), nullable=False)
 
     store = relationship("Store", back_populates="sales")
     employee = relationship("Employee")
