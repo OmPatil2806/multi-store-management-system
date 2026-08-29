@@ -2,7 +2,6 @@ import { createContext, useCallback, useContext, useMemo, useState } from 'react
 import { useNavigate } from 'react-router-dom'
 
 import client, { registerAuthHooks } from '@/api/client'
-import { STORES } from '@/lib/stores'
 
 const AuthContext = createContext(null)
 
@@ -12,9 +11,10 @@ const AuthContext = createContext(null)
 export function AuthProvider({ children }) {
   const [auth, setAuth] = useState({ token: null, role: null, storeId: null })
   // The store the OWNER is currently viewing (switchable via StoreSwitcher).
-  // Irrelevant for employees — their data is always scoped server-side to
-  // their own storeId regardless of this value.
-  const [ownerViewStoreId, setOwnerViewStoreId] = useState(STORES[0].id)
+  // null means "All Stores" — combined/per-store view. Irrelevant for
+  // employees — their data is always scoped server-side to their own
+  // storeId regardless of this value.
+  const [ownerViewStoreId, setOwnerViewStoreId] = useState(null)
   const navigate = useNavigate()
 
   const logout = useCallback(() => {
@@ -25,7 +25,7 @@ export function AuthProvider({ children }) {
     const response = await client.post('/auth/login', { identifier, password })
     const { access_token, role, store_id } = response.data
     setAuth({ token: access_token, role, storeId: store_id })
-    setOwnerViewStoreId(STORES[0].id)
+    setOwnerViewStoreId(null)
   }, [])
 
   useMemo(() => {
