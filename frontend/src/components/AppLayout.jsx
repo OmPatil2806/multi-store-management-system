@@ -7,7 +7,7 @@ export default function AppLayout({ children }) {
       <Sidebar />
 
       <div className="flex flex-1 flex-col overflow-hidden">
-        <header className="flex h-14 shrink-0 items-center justify-end border-b border-border px-6">
+        <header className="flex h-14 shrink-0 items-center justify-end border-b border-border bg-card px-6">
           <StoreSwitcher />
         </header>
 

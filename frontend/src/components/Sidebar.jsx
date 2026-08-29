@@ -1,8 +1,9 @@
 import { NavLink } from 'react-router-dom'
-import { LayoutDashboard, Package, Users, User, ShoppingCart, Receipt, FileText, LogOut, Store } from 'lucide-react'
+import { LayoutDashboard, Package, Users, User, ShoppingCart, Receipt, FileText, LogOut } from 'lucide-react'
 
 import { useAuth } from '@/auth/AuthContext'
 import { cn } from '@/lib/utils'
+import Logo from '@/components/Logo'
 
 function getNavItems(role) {
   return [
@@ -23,9 +24,8 @@ export default function Sidebar() {
 
   return (
     <aside className="flex h-screen w-60 shrink-0 flex-col border-r border-border bg-card">
-      <div className="flex items-center gap-2 px-5 py-5">
-        <Store className="size-5 text-primary" strokeWidth={2} />
-        <span className="text-sm font-semibold tracking-tight">Supermarket Admin</span>
+      <div className="px-5 py-5">
+        <Logo size="sm" />
       </div>
 
       <nav className="flex flex-1 flex-col gap-1 px-3">
@@ -37,8 +37,8 @@ export default function Sidebar() {
               cn(
                 'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
                 isActive
-                  ? 'bg-accent text-accent-foreground'
-                  : 'text-muted-foreground hover:bg-accent/60 hover:text-accent-foreground'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
               )
             }
           >
@@ -49,10 +49,23 @@ export default function Sidebar() {
       </nav>
 
       <div className="border-t border-border px-3 py-3">
+        {/* Static personal branding, not a per-user avatar system — always
+            this same photo regardless of who's logged in. */}
+        <div className="flex items-center gap-3 px-3 py-2">
+          <img
+            src="/images/owner-avatar.jpg"
+            alt=""
+            className="size-9 shrink-0 rounded-full border border-border object-cover"
+          />
+          <span className="text-sm text-muted-foreground">
+            {role === 'owner' ? 'Owner' : 'Employee'}
+          </span>
+        </div>
+
         <button
           type="button"
           onClick={logout}
-          className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent/60 hover:text-accent-foreground"
+          className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
         >
           <LogOut className="size-4" strokeWidth={2} />
           Logout
