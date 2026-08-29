@@ -1,19 +1,24 @@
 import { NavLink } from 'react-router-dom'
-import { LayoutDashboard, Package, Users, ShoppingCart, FileText, LogOut, Store } from 'lucide-react'
+import { LayoutDashboard, Package, Users, User, ShoppingCart, FileText, LogOut, Store } from 'lucide-react'
 
 import { useAuth } from '@/auth/AuthContext'
 import { cn } from '@/lib/utils'
 
-const NAV_ITEMS = [
-  { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { to: '/products', label: 'Products', icon: Package },
-  { to: '/employees', label: 'Employees', icon: Users },
-  { to: '/checkout', label: 'Checkout', icon: ShoppingCart },
-  { to: '/reports', label: 'Reports', icon: FileText },
-]
+function getNavItems(role) {
+  return [
+    { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { to: '/products', label: 'Products', icon: Package },
+    role === 'owner'
+      ? { to: '/employees', label: 'Employees', icon: Users }
+      : { to: '/my-profile', label: 'My Profile', icon: User },
+    { to: '/checkout', label: 'Checkout', icon: ShoppingCart },
+    { to: '/reports', label: 'Reports', icon: FileText },
+  ]
+}
 
 export default function Sidebar() {
-  const { logout } = useAuth()
+  const { role, logout } = useAuth()
+  const navItems = getNavItems(role)
 
   return (
     <aside className="flex h-screen w-60 shrink-0 flex-col border-r border-border bg-card">
@@ -23,7 +28,7 @@ export default function Sidebar() {
       </div>
 
       <nav className="flex flex-1 flex-col gap-1 px-3">
-        {NAV_ITEMS.map(({ to, label, icon: Icon }) => (
+        {navItems.map(({ to, label, icon: Icon }) => (
           <NavLink
             key={to}
             to={to}

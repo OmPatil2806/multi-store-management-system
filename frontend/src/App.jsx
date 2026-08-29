@@ -3,9 +3,13 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import { AuthProvider } from '@/auth/AuthContext'
 import ProtectedRoute from '@/auth/ProtectedRoute'
 import AppLayout from '@/components/AppLayout'
+import { Toaster } from '@/components/ui/sonner'
 import ComingSoon from '@/pages/ComingSoon'
 import Dashboard from '@/pages/Dashboard'
+import Employees from '@/pages/Employees'
 import Login from '@/pages/Login'
+import MyProfile from '@/pages/MyProfile'
+import Products from '@/pages/Products'
 
 function ProtectedPage({ children }) {
   return (
@@ -18,6 +22,7 @@ function ProtectedPage({ children }) {
 function App() {
   return (
     <AuthProvider>
+      <Toaster position="top-right" />
       <Routes>
         <Route path="/login" element={<Login />} />
 
@@ -33,7 +38,7 @@ function App() {
           path="/products"
           element={
             <ProtectedPage>
-              <ComingSoon title="Products" />
+              <Products />
             </ProtectedPage>
           }
         />
@@ -41,7 +46,15 @@ function App() {
           path="/employees"
           element={
             <ProtectedPage>
-              <ComingSoon title="Employees" />
+              <Employees />
+            </ProtectedPage>
+          }
+        />
+        <Route
+          path="/my-profile"
+          element={
+            <ProtectedPage>
+              <MyProfile />
             </ProtectedPage>
           }
         />

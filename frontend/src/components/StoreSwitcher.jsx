@@ -1,21 +1,18 @@
-import { useState } from 'react'
-
 import { useAuth } from '@/auth/AuthContext'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { STORES } from '@/lib/stores'
 
 export default function StoreSwitcher() {
-  const { role } = useAuth()
-  const [selected, setSelected] = useState(String(STORES[0].id))
+  const { role, viewStoreId, setViewStoreId } = useAuth()
 
   if (role !== 'owner') {
     return null
   }
 
-  const selectedName = STORES.find((store) => String(store.id) === selected)?.name
+  const selectedName = STORES.find((store) => store.id === viewStoreId)?.name
 
   return (
-    <Select value={selected} onValueChange={setSelected}>
+    <Select value={String(viewStoreId)} onValueChange={(value) => setViewStoreId(Number(value))}>
       <SelectTrigger className="w-44">
         <SelectValue placeholder="Select store">{selectedName}</SelectValue>
       </SelectTrigger>
