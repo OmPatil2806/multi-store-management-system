@@ -5,12 +5,12 @@ import ProtectedRoute from '@/auth/ProtectedRoute'
 import AppLayout from '@/components/AppLayout'
 import { Toaster } from '@/components/ui/sonner'
 import Checkout from '@/pages/Checkout'
-import ComingSoon from '@/pages/ComingSoon'
 import Dashboard from '@/pages/Dashboard'
 import Employees from '@/pages/Employees'
 import Login from '@/pages/Login'
 import MyProfile from '@/pages/MyProfile'
 import Products from '@/pages/Products'
+import Reports from '@/pages/Reports'
 import SalesHistory from '@/pages/SalesHistory'
 
 function ProtectedPage({ children }) {
@@ -80,7 +80,7 @@ function App() {
           path="/reports"
           element={
             <ProtectedPage>
-              <ComingSoon title="Reports" />
+              <Reports />
             </ProtectedPage>
           }
         />
