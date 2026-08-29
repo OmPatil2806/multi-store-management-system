@@ -90,6 +90,10 @@ class EmployeeCreate(BaseModel):
     initial_password: str
 
 
+class ResetPasswordRequest(BaseModel):
+    new_password: str
+
+
 class EmployeeUpdate(BaseModel):
     name: str | None = None
     phone: str | None = None

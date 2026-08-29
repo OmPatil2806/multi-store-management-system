@@ -12,6 +12,7 @@ from schemas import (
     EmployeeResponse,
     EmployeeSelfResponse,
     EmployeeUpdate,
+    ResetPasswordRequest,
 )
 from utils import generate_employee_code
 
@@ -139,6 +140,24 @@ def update_employee(
     db.commit()
     db.refresh(employee)
     return employee
+
+
+@router.put("/{employee_id}/reset-password", status_code=status.HTTP_204_NO_CONTENT)
+def reset_employee_password(
+    employee_id: int,
+    payload: ResetPasswordRequest,
+    current_user: User = Depends(require_owner),
+    db: Session = Depends(get_db),
+):
+    employee = db.query(Employee).filter(Employee.id == employee_id).first()
+    if employee is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Employee not found")
+
+    if employee.user is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Linked user account not found")
+
+    employee.user.hashed_password = hash_password(payload.new_password)
+    db.commit()
 
 
 @router.delete("/{employee_id}", status_code=status.HTTP_204_NO_CONTENT)
